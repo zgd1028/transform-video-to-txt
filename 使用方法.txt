@@ -9,34 +9,49 @@
 【环境要求】
 1. Python 3.8+
 2. FFmpeg (音频处理工具)
+3. Git (用于克隆仓库，也可以用浏览器下载ZIP包)
 
-【安装步骤】
+【快速开始】
 
-1. 安装 Python 依赖
-   pip install -r requirements.txt
+  第1步：下载项目
+    git clone https://github.com/zgd1028/transform-video-to-txt.git
+    cd transform-video-to-txt
 
-2. 安装 FFmpeg (如未安装)
-   winget install ffmpeg
+    如果没有安装 Git，可以直接在浏览器打开上述网址，
+    点击 "Code" → "Download ZIP" 下载后解压。
 
-   或者从官网下载: https://ffmpeg.org/download.html
+  第2步：安装 Python 依赖
+    pip install -r requirements.txt
+
+  第3步：安装 FFmpeg (如未安装)
+    winget install ffmpeg
+
+    或者从官网下载: https://ffmpeg.org/download.html
+
+  第4步：启动网页版
+    python app.py
+
+    浏览器打开: http://127.0.0.1:5000
+    在输入框中粘贴视频URL，点击"开始提取"即可。
 
 【基本使用】
 
 方式一：网页版 (推荐)
   1. 运行: python app.py
   2. 浏览器打开: http://127.0.0.1:5000
-  3. 在输入框中粘贴视频URL，点击"开始提取"
+  3. 粘贴 B站 或 抖音 视频链接，点击"开始提取"
   4. 等待处理完成，页面直接显示带时间戳的文字
+  5. 页面内置进度条、趣味文字和俄罗斯方块小游戏供等待时消遣
 
 方式二：命令行
   打开终端，进入本目录，运行：
 
      python extract_text.py "视频URL"
 
-示例：
+  示例：
 
-   python extract_text.py "https://www.bilibili.com/video/BV1xx411c7mD"
-   python extract_text.py "https://www.douyin.com/video/xxxxx"
+     python extract_text.py "https://www.bilibili.com/video/BV1xx411c7mD"
+     python extract_text.py "https://www.douyin.com/video/xxxxx"
 
 【命令行参数】
 
@@ -71,7 +86,7 @@
 【使用示例】
 
 1. 基本使用 (默认 small 模型, 纯文本输出):
-   python extract_text.py "https://www.bilibili.com/video/BV1xxx" > 输出文本.txt
+   python extract_text.py "https://www.bilibili.com/video/BV1xxx"
 
 2. 输出为 SRT 字幕文件:
    python extract_text.py "https://..." --format srt -o output.srt
@@ -93,6 +108,19 @@
 
 8. 显示详细处理信息:
    python extract_text.py "https://..." --verbose
+
+【让朋友也使用】
+
+  本项目是本地工具，需要每人在自己的电脑上运行。让朋友按上面"快速开始"
+  的步骤操作即可，大概 5 分钟就能搞定：
+
+  1. 把仓库链接发给朋友: https://github.com/zgd1028/transform-video-to-txt
+  2. 让朋友依次执行第1~4步
+  3. 首次运行会自动下载 Whisper 模型(约1GB)，朋友耐心等一次即可
+
+  注意：你和朋友必须在同一个局域网(WiFi)下，他才能通过
+        http://你的IP:5000 直接访问你电脑上的服务。
+        不在同一网络时，朋友需要自己本地运行。
 
 【输出格式说明】
 
@@ -126,9 +154,10 @@ A: 目前仅支持 Bilibili (bilibili.com/video/) 和 抖音 (douyin.com/video/)
 Q: 提示 "视频不可用"
 A: 该视频可能已删除、设为私密，或需要登录才能观看
 
-Q: 首次运行很慢
+Q: 首次运行很慢 / 模型加载失败
 A: 首次运行会自动下载 Whisper 模型，small 约1GB，下载时间取决于网络速度
-   后续运行会直接使用已下载的模型
+   后续运行会直接使用已下载的模型。
+   国内用户如遇下载失败，代码已默认使用国内镜像(hf-mirror.com)。
 
 Q: 识别准确度不够
 A: 可尝试使用更大的模型:
@@ -146,9 +175,12 @@ A: yt-dlp支持cookies，在浏览器登录后导出cookies文件，
 【文件夹结构】
 
    爬视频中的文字/
-   ├── extract_text.py     主入口 (命令行工具)
-   ├── downloader.py       URL验证 + 音频下载
-   ├── transcriber.py      语音转文字
-   ├── formatter.py        时间戳注入 + 格式化输出
-   ├── requirements.txt    Python依赖
-   └── 使用方法.txt        本文件
+   ├── app.py               网页版入口 (启动后浏览器打开)
+   ├── extract_text.py      命令行入口
+   ├── downloader.py        URL验证 + 音频下载
+   ├── transcriber.py       语音转文字
+   ├── formatter.py         时间戳注入 + 格式化输出
+   ├── requirements.txt     Python依赖
+   ├── templates/           网页模板
+   ├── static/              静态资源 (俄罗斯方块等)
+   └── 使用方法.txt         本文件
