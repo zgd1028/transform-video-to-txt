@@ -1,6 +1,10 @@
 """Speech-to-text transcription using faster-whisper."""
 
+import os
 from pathlib import Path
+
+# 国内用户默认使用镜像，避免 HuggingFace 被墙
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 
 class TranscriptionError(Exception):
