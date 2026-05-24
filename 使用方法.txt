@@ -1,0 +1,147 @@
+==========================
+视频语音文字提取工具 — 使用方法
+==========================
+
+【功能说明】
+从Bilibili(哔哩哔哩)和抖音的网页版视频中提取语音文字，
+并每隔20秒标注一次文字在视频中的具体时间。
+
+【环境要求】
+1. Python 3.8+
+2. FFmpeg (音频处理工具)
+
+【安装步骤】
+
+1. 安装 Python 依赖
+   pip install -r requirements.txt
+
+2. 安装 FFmpeg (如未安装)
+   winget install ffmpeg
+
+   或者从官网下载: https://ffmpeg.org/download.html
+
+【基本使用】
+
+打开终端，进入本目录，运行：
+
+   python extract_text.py "视频URL"
+
+示例：
+
+   python extract_text.py "https://www.bilibili.com/video/BV1xx411c7mD"
+   python extract_text.py "https://www.douyin.com/video/xxxxx"
+
+【命令行参数】
+
+   python extract_text.py <URL> [选项]
+
+   必填参数:
+     url                     视频URL (Bilibili或抖音网页版)
+
+   可选参数:
+     --model, -m             模型大小，可选: tiny, base, small(默认), medium, large-v3
+                             tiny 最快但精度低，large-v3 最准但需要更多显存/内存
+                             首次使用会自动下载模型 (small约1GB, large-v3约3GB)
+
+     --format, -f            输出格式，可选: text(默认), srt, json
+                             text = 带时间戳的纯文本
+                             srt  = 标准字幕格式 (可导入视频播放器)
+                             json = 机器可读的JSON格式
+
+     --interval, -i          时间戳标注间隔(秒)，默认: 20
+
+     --output, -o            输出到文件，不指定则输出到终端
+
+     --keep-audio            保留下载的音频文件 (默认会删除)
+
+     --language, -l          视频语言代码，默认: zh (中文)
+
+     --device, -d            推理设备，默认: cpu
+                             有NVIDIA显卡且装了CUDA可设为 cuda
+
+     --verbose, -v           显示详细进度信息
+
+【使用示例】
+
+1. 基本使用 (默认 small 模型, 纯文本输出):
+   python extract_text.py "https://www.bilibili.com/video/BV1xxx" > 输出文本.txt
+
+2. 输出为 SRT 字幕文件:
+   python extract_text.py "https://..." --format srt -o output.srt
+
+3. 输出为 JSON 格式:
+   python extract_text.py "https://..." --format json -o output.json
+
+4. 使用大模型提高识别精度:
+   python extract_text.py "https://..." --model large-v3
+
+5. 修改时间戳间隔为30秒:
+   python extract_text.py "https://..." --interval 30
+
+6. 有NVIDIA显卡时使用GPU加速:
+   python extract_text.py "https://..." --device cuda --model large-v3
+
+7. 保留下载的音频文件:
+   python extract_text.py "https://..." --keep-audio
+
+8. 显示详细处理信息:
+   python extract_text.py "https://..." --verbose
+
+【输出格式说明】
+
+1. text 格式 (默认):
+   [00:00:00]
+   大家好，欢迎收看今天的视频...今天我们来聊聊这个话题。
+   [00:00:20]
+   根据最新的研究数据表明...
+
+   时间戳标注间隔默认20秒，可使用 --interval 调整。
+
+2. SRT 格式:
+   1
+   00:00:00,000 --> 00:00:05,200
+   大家好，欢迎收看今天的视频。
+
+   可直接导入播放器作为字幕。
+
+3. JSON 格式:
+   包含完整元数据 (平台、时长、模型、语言、分段、时间戳标记)
+
+【常见问题】
+
+Q: 提示 "未找到 FFmpeg"
+A: 运行 winget install ffmpeg 安装，或从 ffmpeg.org 下载
+
+Q: 提示 "不支持的URL"
+A: 目前仅支持 Bilibili (bilibili.com/video/) 和 抖音 (douyin.com/video/)
+   请确认URL格式正确
+
+Q: 提示 "视频不可用"
+A: 该视频可能已删除、设为私密，或需要登录才能观看
+
+Q: 首次运行很慢
+A: 首次运行会自动下载 Whisper 模型，small 约1GB，下载时间取决于网络速度
+   后续运行会直接使用已下载的模型
+
+Q: 识别准确度不够
+A: 可尝试使用更大的模型:
+   python extract_text.py "URL" --model large-v3
+
+Q: 处理速度太慢
+A: - 使用更小的模型: --model tiny 或 --model base
+   - 有NVIDIA显卡可启用GPU: --device cuda
+
+Q: 部分B站/抖音视频需要登录
+A: yt-dlp支持cookies，在浏览器登录后导出cookies文件，
+   然后添加到 downloader.py 的 ydl_opts 中:
+   'cookiefile': 'cookies.txt'
+
+【文件夹结构】
+
+   爬视频中的文字/
+   ├── extract_text.py     主入口 (命令行工具)
+   ├── downloader.py       URL验证 + 音频下载
+   ├── transcriber.py      语音转文字
+   ├── formatter.py        时间戳注入 + 格式化输出
+   ├── requirements.txt    Python依赖
+   └── 使用方法.txt        本文件
